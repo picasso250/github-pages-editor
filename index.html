@@ -2,7 +2,9 @@
 <html>
   <head>
     <title>Hello World!</title>
-    <!-- <link href="http://kevinburke.bitbucket.org/markdowncss/markdown.css" rel="stylesheet"></link> -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+
     <style type="text/css">
     #LeftWrap {
       /*float: left;*/
@@ -20,38 +22,31 @@
     </style>
     <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
     <script type="text/javascript">
-    // $.get('http://localhost/ajax.php', {}, function(e) {
-    //   $('#preview').html(e);
-    // }, 'html');
+    hljs.initHighlightingOnLoad();
     $(function(){
-      var baseUrl = 'http://localhost/ajax.php';
-      $('#FileInput').on('change', function(e){
-        console.log(e);
-        console.log($(this).val());
-      });
-      $('#DragHere').on('dragenter dragover drop', function (e) {
-        console.log(e);
-        event.stopPropagation(); 
-        event.preventDefault();
-      });
+
       var mdTextarea = $('[name=md]');
       var filePathInput = $('#FilePath');
-      filePathInput.change(function() {
-        var file_path = $(this).val();
-        $.get(baseUrl+'?action=get_file', {file_path: file_path}, function(ret) {
+      var reloadFile = function() {
+        var file_path = filePathInput.val();
+        $.get('?action=get_file', {file_path: file_path}, function(ret) {
           mdTextarea.val(ret);
         }, 'text');
-      });
-      mdTextarea.on('keyup change', function () {
+      };
+      reloadFile();
+      filePathInput.on('change click', reloadFile);
+      mdTextarea.on('keyup change click', function () {
         var text = mdTextarea.val();
         var file_path = filePathInput.val();
         var data = {
           text: text,
           file_path: file_path
         };
-        console.log('post');
-        $.post(baseUrl+'?action=preview', data, function (ret) {
+        $.post('?action=preview', data, function (ret) {
           $('#Preview').html(ret);
+          $('#Preview pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+          });
         });
       });
     });
@@ -62,7 +57,7 @@
       <div id="LeftWrap">
         <form>
           <div>
-            <input id="FilePath" type="text">
+            <input id="FilePath" type="text" value="<?= $file_path ?>">
           </div>
           <div>
           	<textarea name="md"></textarea>
