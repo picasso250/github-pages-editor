@@ -2,8 +2,8 @@
 <html>
   <head>
     <title>Hello World!</title>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <link rel="stylesheet" href="/highlight/default.min.css">
+    <script src="/highlight/highlight.min.js"></script>
 
     <style type="text/css">
     #LeftWrap {
@@ -44,9 +44,8 @@
     </style>
     <script type="text/javascript" src="http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.js"></script>
     <script type="text/javascript">
-    hljs.initHighlightingOnLoad();
+    // hljs.initHighlightingOnLoad();
     $(function() {
-      var mdTextarea = $('#MarkDownText');
       var filePathInput = $('#FilePath');
       var lineColPanel = $('#LineCol');
       var i;
@@ -54,36 +53,47 @@
         lineColPanel.append('<span>'+i+'</span><br>');
       };
       var FackEditor = $('#FackEditor');
-      var propList = ['font-size', 'font-family', 'line-'];
+      var propList = ['font-size', 'font-family'];
       for (i in propList) {
         var prop = propList[i];
         var value = filePathInput.css(prop);
-        console.log(prop, value);
+        // console.log(prop, value);
         lineColPanel.css(prop, value);
         FackEditor.css(prop, value);
       };
       var reHeight = function() {
         var height = $(document).height() - filePathInput.height() - 50;
-        console.log(height);
-        mdTextarea.height(height);
+        FackEditor.height(height);
         lineColPanel.height(height);
       };
       reHeight();
       $( window ).resize(reHeight);
+      var preCode = $('#FackEditor pre code');
+      var highlightFunc = function(text) {
+        // console.log('get_file ret', ret);
+        // hljs.configure({useBR: true});
+        preCode.html(hljs.highlight("markdown", text).value);
+        // console.log('html', html);
+      };
       var reloadFile = function() {
         var file_path = filePathInput.val();
-        $.get('?action=get_file', {file_path: file_path}, function(ret) {
-          mdTextarea.val(ret);
+        $.get('?action=get_file', {file_path: file_path}, function (ret) {
+          highlightFunc(ret);
         }, 'text');
       };
       reloadFile();
       filePathInput.on('change click', reloadFile);
       var text2html = function(text) {
-        return text.replace(/\n/g, '<br>').replace(/ /g, '&nbsp');
+        return text.replace(/\n/g, '<br>\n').replace(/ /g, '&nbsp;');
       };
-      mdTextarea.on('keyup change click', function () {
-        var text = mdTextarea.val();
-        FackEditor.html(text2html(text));
+      var html2text = function (html) {
+        text = html.replace(/&nbsp;/g, " ").replace(/<.+?>/g, '').replace(/^\s+/g, '');
+        console.log('after html2text', text);
+        return text;
+      }
+      FackEditor.on('keyup change click', function () {
+        var text = html2text(FackEditor.html());
+        // console.log(text);
         var file_path = filePathInput.val();
         var data = {
           text: text,
@@ -91,9 +101,11 @@
         };
         $.post('?action=preview', data, function (ret) {
           $('#Preview').html(ret);
-          $('#Preview pre code').each(function(i, block) {
+          // code syntax highlight
+          $('#Preview pre code').html(ret).each(function(i, block) {
             hljs.highlightBlock(block);
           });
+          highlightFunc(text);
         });
       });
     });
@@ -108,8 +120,9 @@
           </div>
           <div id="EditorArea">
             <div id="LineCol"></div>
-            <div id="FackEditor"></div>
-            <textarea id="MarkDownText" name="md"></textarea>
+            <div id="FackEditor" contenteditable="true">
+              <pre><code class="markdown"></code></pre>
+            </div>
           </div>
         </form>
       </div>

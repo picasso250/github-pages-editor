@@ -29,8 +29,23 @@ function get_file()
 	$file_path = current_file();
 	// D:\play-good\picasso250.github.com\_posts\2014-12-26-PHP-sugar.md
 	if (is_file($file_path)) {
+		// $content = file_get_contents($file_path);
+		// echo text2html($content);
 		readfile($file_path);
 	}
+}
+
+function html2text($html)
+{
+	$html = preg_replace('/<br>\n?/', "\n", $html);
+	$html = preg_replace('/&nbsp;/', ' ', $html);
+	return strip_tags($html);
+}
+
+function text2html($text)
+{
+	$text = str_replace(' ', '&nbsp;', $text);
+	return nl2br($text);
 }
 
 function current_file()
@@ -46,8 +61,9 @@ function preview()
 {
 	$file_path = current_file();
 	$text = _post('text');
+	$text = html2text($text);
 	if ($text) {
-		file_put_contents($file_path, "$text\n");
+		// file_put_contents($file_path, html2text($text));
 	}
 	$text = preg_replace('/title: (.+)/u', '<h1>$1</h1>', $text);
 	$text = preg_replace('/layout: (\w+)/', '', $text);
