@@ -14,19 +14,42 @@
     #RightWrap {
       margin-left: 600px;/*==等于左边栏宽度==*/
     }
-    [name=md] {
-      /*margin: 10px;*/
-      width: 566px;
-      height: 600px;
+    #EditorArea * {
+      padding: 0;
+      margin: 0;
+    }
+    #LineCol {
+      width: 30px;
+      float: left;
+      background-color: red;
+      text-align: right;;
+    }
+    #MarkDownText {
+      /*margin-left: 10px;*/
+      width: 556px;
     }
     </style>
     <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
     <script type="text/javascript">
     hljs.initHighlightingOnLoad();
-    $(function(){
-
-      var mdTextarea = $('[name=md]');
+    $(function() {
+      var mdTextarea = $('#MarkDownText');
       var filePathInput = $('#FilePath');
+      var lineColPanel = $('#LineCol');
+      for (var i = 0; i < 999; i++) {
+        lineColPanel.append('<span>'+i+'</span><br>');
+      };
+      for (prop in ['font-size', 'font-family']) {
+        lineColPanel.css(prop, filePathInput.css(prop));
+      };
+      var reHeight = function() {
+        var height = $(document).height() - filePathInput.height() - 50;
+        console.log(height);
+        mdTextarea.height(height);
+        lineColPanel.height(height);
+      };
+      reHeight();
+      $( window ).resize(reHeight);
       var reloadFile = function() {
         var file_path = filePathInput.val();
         $.get('?action=get_file', {file_path: file_path}, function(ret) {
@@ -59,8 +82,9 @@
           <div>
             <input id="FilePath" type="text" value="<?= $file_path ?>">
           </div>
-          <div>
-          	<textarea name="md"></textarea>
+          <div id="EditorArea">
+            <div id="LineCol"></div>
+          	<textarea id="MarkDownText" name="md"></textarea>
           </div>
         </form>
       </div>
