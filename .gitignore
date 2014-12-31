@@ -46,3 +46,5 @@ jquery-2.0.3.min.js
 vendor/
 highlight/default.min.css
 highlight/highlight.min.js
+ace/ace.js
+ace/mode-markdown.js

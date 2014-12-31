@@ -5,10 +5,12 @@
     <link rel="stylesheet" href="/highlight/default.min.css">
     <script src="/highlight/highlight.min.js"></script>
 
+    <script src="/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+
     <style type="text/css">
     #LeftWrap {
-      /*float: left;*/
-      position: fixed;
+      float: left;
+      /*position: fixed;*/
       width: 600px;
     }
     #RightWrap {
@@ -19,80 +21,37 @@
     }
     #FackEditor {
       position: absolute;
-      top: 0;
-      left: 30px;
-      letter-spacing: 0.1px;
-    }
-    #EditorArea * {
-      padding: 0;
-      margin: 0;
-      font-family: Arial;
-    }
-    #LineCol {
-      width: 30px;
-      float: left;
-      background-color: red;
-      text-align: right;
-    }
-    #MarkDownText {
-      opacity: 50%;
-      /*margin-left: 10px;*/
       width: 556px;
-      border: 0px solid;
-      color: red;
+      height: 500px;
     }
     </style>
     <script type="text/javascript" src="http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.js"></script>
     <script type="text/javascript">
     // hljs.initHighlightingOnLoad();
     $(function() {
-      var filePathInput = $('#FilePath');
-      var lineColPanel = $('#LineCol');
-      var i;
-      for (i = 0; i < 999; i++) {
-        lineColPanel.append('<span>'+i+'</span><br>');
-      };
       var FackEditor = $('#FackEditor');
-      var propList = ['font-size', 'font-family'];
-      for (i in propList) {
-        var prop = propList[i];
-        var value = filePathInput.css(prop);
-        // console.log(prop, value);
-        lineColPanel.css(prop, value);
-        FackEditor.css(prop, value);
-      };
+      var editor = ace.edit("FackEditor");
+      editor.getSession().setMode("ace/mode/markdown");
+
+      var filePathInput = $('#FilePath');
       var reHeight = function() {
         var height = $(document).height() - filePathInput.height() - 50;
         FackEditor.height(height);
-        lineColPanel.height(height);
+        editor.resize();
       };
       reHeight();
       $( window ).resize(reHeight);
-      var preCode = $('#FackEditor pre code');
-      var highlightFunc = function(text) {
-        // console.log('get_file ret', ret);
-        // hljs.configure({useBR: true});
-        preCode.html(hljs.highlight("markdown", text).value);
-        // console.log('html', html);
-      };
       var reloadFile = function() {
         var file_path = filePathInput.val();
         $.get('?action=get_file', {file_path: file_path}, function (ret) {
-          highlightFunc(ret);
+          editor.setValue(ret);
         }, 'text');
       };
       reloadFile();
       filePathInput.on('change click', reloadFile);
-      var text2html = function(text) {
-        return text.replace(/\n/g, '<br>\n').replace(/ /g, '&nbsp;');
-      };
-      var html2text = function (html) {
-        text = html.replace(/&nbsp;/g, " ").replace(/<.+?>/g, '').replace(/^\s+/g, '');
-        console.log('after html2text', text);
-        return text;
-      }
-      FackEditor.on('keyup change click', function () {
-        var text = html2text(FackEditor.html());
+
+      editor.getSession().on('change', function () {
+        var text = editor.getValue();
         // console.log(text);
         var file_path = filePathInput.val();
         var data = {
@@ -119,9 +78,7 @@
             <input id="FilePath" type="text" value="<?= $file_path ?>">
           </div>
           <div id="EditorArea">
-            <div id="LineCol"></div>
-            <div id="FackEditor" contenteditable="true">
-              <pre><code class="markdown"></code></pre>
+            <div id="FackEditor" >
             </div>
           </div>
         </form>
