@@ -2,11 +2,20 @@
 <html>
   <head>
     <title>Hello World!</title>
-    <link href="http://kevinburke.bitbucket.org/markdowncss/markdown.css" rel="stylesheet"></link>
+    <!-- <link href="http://kevinburke.bitbucket.org/markdowncss/markdown.css" rel="stylesheet"></link> -->
     <style type="text/css">
+    #LeftWrap {
+      /*float: left;*/
+      position: fixed;
+      width: 600px;
+    }
+    #RightWrap {
+      margin-left: 600px;/*==等于左边栏宽度==*/
+    }
     [name=md] {
-      width: 100%;
-      height: 300px;
+      /*margin: 10px;*/
+      width: 566px;
+      height: 600px;
     }
     </style>
     <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
@@ -26,7 +35,8 @@
         event.preventDefault();
       });
       var mdTextarea = $('[name=md]');
-      $('#FilePath').change(function() {
+      var filePathInput = $('#FilePath');
+      filePathInput.change(function() {
         var file_path = $(this).val();
         $.get(baseUrl+'?action=get_file', {file_path: file_path}, function(ret) {
           mdTextarea.val(ret);
@@ -34,8 +44,13 @@
       });
       mdTextarea.on('keyup change', function () {
         var text = mdTextarea.val();
+        var file_path = filePathInput.val();
+        var data = {
+          text: text,
+          file_path: file_path
+        };
         console.log('post');
-        $.post(baseUrl+'?action=preview', {text: text}, function (ret) {
+        $.post(baseUrl+'?action=preview', data, function (ret) {
           $('#Preview').html(ret);
         });
       });
@@ -43,13 +58,21 @@
     </script>
   </head>
   <body>
-    <h1>markdown</h1>
-    <form>
-      <input id="FileInput" type="file">
-      <input id="FilePath" type="text">
-    	<textarea name="md"></textarea>
-    </form>
-    <div id="Preview"></div>
+    <div class="pure-g">
+      <div id="LeftWrap">
+        <form>
+          <div>
+            <input id="FilePath" type="text">
+          </div>
+          <div>
+          	<textarea name="md"></textarea>
+          </div>
+        </form>
+      </div>
+      <div id="RightWrap">
+        <div id="Preview" class="pure-u-1-3"></div>
+      </div>
+    </div>
     <div id="DragHere">drag here</div>
   </body>
 </html>

@@ -34,7 +34,14 @@ function get_file()
 
 function preview()
 {
+	$file_path = _post('file_path');
+	if (empty($file_path)) {
+		die('no file_path');
+	}
 	$text = _post('text');
+	if ($text) {
+		file_put_contents($file_path, $text);
+	}
 	$my_html = Markdown::defaultTransform($text);
 	echo $my_html;
 }
