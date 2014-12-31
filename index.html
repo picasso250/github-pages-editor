@@ -14,19 +14,32 @@
     #RightWrap {
       margin-left: 600px;/*==等于左边栏宽度==*/
     }
+    #EditorArea {
+      position: relative;
+    }
+    #FackEditor {
+      position: absolute;
+      top: 0;
+      left: 30px;
+      letter-spacing: 0.1px;
+    }
     #EditorArea * {
       padding: 0;
       margin: 0;
+      font-family: Arial;
     }
     #LineCol {
       width: 30px;
       float: left;
       background-color: red;
-      text-align: right;;
+      text-align: right;
     }
     #MarkDownText {
+      opacity: 50%;
       /*margin-left: 10px;*/
       width: 556px;
+      border: 0px solid;
+      color: red;
     }
     </style>
     <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
@@ -36,11 +49,18 @@
       var mdTextarea = $('#MarkDownText');
       var filePathInput = $('#FilePath');
       var lineColPanel = $('#LineCol');
-      for (var i = 0; i < 999; i++) {
+      var i;
+      for (i = 0; i < 999; i++) {
         lineColPanel.append('<span>'+i+'</span><br>');
       };
-      for (prop in ['font-size', 'font-family']) {
-        lineColPanel.css(prop, filePathInput.css(prop));
+      var FackEditor = $('#FackEditor');
+      var propList = ['font-size', 'font-family', 'line-'];
+      for (i in propList) {
+        var prop = propList[i];
+        var value = filePathInput.css(prop);
+        console.log(prop, value);
+        lineColPanel.css(prop, value);
+        FackEditor.css(prop, value);
       };
       var reHeight = function() {
         var height = $(document).height() - filePathInput.height() - 50;
@@ -58,8 +78,12 @@
       };
       reloadFile();
       filePathInput.on('change click', reloadFile);
+      var text2html = function(text) {
+        return text.replace(/\n/g, '<br>').replace(/ /g, '&nbsp');
+      };
       mdTextarea.on('keyup change click', function () {
         var text = mdTextarea.val();
+        FackEditor.html(text2html(text));
         var file_path = filePathInput.val();
         var data = {
           text: text,
@@ -84,7 +108,8 @@
           </div>
           <div id="EditorArea">
             <div id="LineCol"></div>
-          	<textarea id="MarkDownText" name="md"></textarea>
+            <div id="FackEditor"></div>
+            <textarea id="MarkDownText" name="md"></textarea>
           </div>
         </form>
       </div>
