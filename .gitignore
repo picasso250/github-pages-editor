@@ -41,3 +41,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+composer.phar
+jquery-2.0.3.min.js
+vendor/

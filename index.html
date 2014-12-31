@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello World!</title>
+    <link href="http://kevinburke.bitbucket.org/markdowncss/markdown.css" rel="stylesheet"></link>
+    <style type="text/css">
+    [name=md] {
+      width: 100%;
+      height: 300px;
+    }
+    </style>
+    <script type="text/javascript" src="jquery-2.0.3.min.js"></script>
+    <script type="text/javascript">
+    // $.get('http://localhost/ajax.php', {}, function(e) {
+    //   $('#preview').html(e);
+    // }, 'html');
+    $(function(){
+      var baseUrl = 'http://localhost/ajax.php';
+      $('#FileInput').on('change', function(e){
+        console.log(e);
+        console.log($(this).val());
+      });
+      $('#DragHere').on('dragenter dragover drop', function (e) {
+        console.log(e);
+        event.stopPropagation(); 
+        event.preventDefault();
+      });
+      var mdTextarea = $('[name=md]');
+      $('#FilePath').change(function() {
+        var file_path = $(this).val();
+        $.get(baseUrl+'?action=get_file', {file_path: file_path}, function(ret) {
+          mdTextarea.val(ret);
+        }, 'text');
+      });
+      mdTextarea.on('keyup change', function () {
+        var text = mdTextarea.val();
+        console.log('post');
+        $.post(baseUrl+'?action=preview', {text: text}, function (ret) {
+          $('#Preview').html(ret);
+        });
+      });
+    });
+    </script>
+  </head>
+  <body>
+    <h1>markdown</h1>
+    <form>
+      <input id="FileInput" type="file">
+      <input id="FilePath" type="text">
+    	<textarea name="md"></textarea>
+    </form>
+    <div id="Preview"></div>
+    <div id="DragHere">drag here</div>
+  </body>
+</html>
