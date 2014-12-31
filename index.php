@@ -49,6 +49,8 @@ function preview()
 	if ($text) {
 		file_put_contents($file_path, "$text\n");
 	}
+	$text = preg_replace('/title: (.+)/u', '<h1>$1</h1>', $text);
+	$text = preg_replace('/layout: (\w+)/', '', $text);
 	$text = preg_replace('/<% highlight (\w+) %>/', '<pre><code class="$1">', $text);
 	$text = preg_replace('/<% endhighlight %>/', '</code></pre>', $text);
 	$my_html = Markdown::defaultTransform($text);
