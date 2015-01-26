@@ -1,6 +1,6 @@
 <?php
 
-require 'lib.php';
+require __DIR__.'/php-tiny-frame/autoload.php';
 
 spl_autoload_register(function($class){
 	$f = __DIR__.'\vendor\php-markdown-lib/'.$class.'.php';
@@ -15,6 +15,7 @@ session_start();
 
 $action = _get('action');
 if (empty($action)) {
+	$root = current_root();
 	$file_path = current_file();
 	include 'index.html';
 	exit;
@@ -34,7 +35,20 @@ function get_file()
 		readfile($file_path);
 	}
 }
-
+function get_file_list()
+{
+	$root = current_root();
+	if (is_dir($root)) {
+		echo json(file_list($root));
+	} else {
+		echo json(1, 'not dir');
+	}
+}
+function file_list($root) {
+	return array_map(function ($file_name) {
+		return [$file_name, basename($file_name)];
+	}, glob("$root/*.md"));
+}
 function html2text($html)
 {
 	$html = preg_replace('/<br>\n?/', "\n", $html);
@@ -53,6 +67,14 @@ function current_file()
 	$session_key = 'se_fp';
 	if (isset($_REQUEST['file_path']) && ($_REQUEST['file_path'])) {
 		return $_SESSION[$session_key] = trim($_REQUEST['file_path']);
+	}
+	return isset($_SESSION[$session_key]) ? $_SESSION[$session_key] : '';
+}
+function current_root()
+{
+	$session_key = 'se_r';
+	if (isset($_REQUEST['root']) && ($_REQUEST['root'])) {
+		return $_SESSION[$session_key] = trim($_REQUEST['root']);
 	}
 	return isset($_SESSION[$session_key]) ? $_SESSION[$session_key] : '';
 }
