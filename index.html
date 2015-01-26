@@ -10,13 +10,15 @@
     <style type="text/css">
     #LeftWrap {
       float: left;
-      /*position: fixed;*/
-      width: 600px;
+      width: 300px;
+      overflow-x: scroll;
     }
     #RightWrap {
-      margin-left: 600px;/*==等于左边栏宽度==*/
+      margin-left: 900px;/*==等于左边栏宽度==*/
     }
     #EditorArea {
+      float: left;
+      width: 600px;
       position: relative;
     }
     #FackEditor {
@@ -25,7 +27,7 @@
       height: 500px;
     }
     </style>
-    <script type="text/javascript" src="http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.js"></script>
+    <script type="text/javascript" src="jquery-2.0.3.js"></script>
     <script type="text/javascript">
     // hljs.initHighlightingOnLoad();
     $(function() {
@@ -47,7 +49,7 @@
         $.get('?action=get_file_list', {root: d}, function (ret) {
           FileList.html(ret.data.map(function (e) {
             return '<option value="'+e[0]+'">'+e[1]+'</option>';
-          }).join(''));
+          }).join('')).attr('size', ret.data.length);
         }, 'json');
       }
       var reloadFile = function() {
@@ -58,10 +60,8 @@
           editor.getSession().setUseWrapMode(true);
         }, 'text');
       };
-      reloadFileList();
-      // reloadFile();
       DirPath.on('change click', reloadFileList);
-      FileList.on('change click', reloadFile);
+      FileList.on('change', reloadFile);
 
       editor.getSession().on('change', function () {
         var text = editor.getValue();
@@ -91,18 +91,17 @@
             <input id="DirPath" type="text" value="<?= $root ?>">
           </div>
           <div>
-            <select id="FileList"></select>
-          </div>
-          <div id="EditorArea">
-            <div id="FackEditor" >
-            </div>
+            <select id="FileList" size="8"></select>
           </div>
         </form>
+      </div>
+      <div id="EditorArea">
+        <div id="FackEditor" >
+        </div>
       </div>
       <div id="RightWrap">
         <div id="Preview" class="pure-u-1-3"></div>
       </div>
     </div>
-    <div id="DragHere">drag here</div>
   </body>
 </html>
